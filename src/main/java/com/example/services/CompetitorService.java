@@ -18,8 +18,10 @@ import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
 /**
@@ -92,32 +94,35 @@ public class CompetitorService {
     
 }
     
-    @POST
+   @POST
     @Path("/login")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response revision(CompetitorDTO competitor) {
- 
-            JSONObject rta = new JSONObject();
-         Competitor competitorTmp = new Competitor();
-         String a = competitor.getContraseña();
+    public Response login(CompetitorDTO competitor) throws JSONException {
+        JSONObject rta = new JSONObject();
+        Competitor competitorTmp = new Competitor();
+        competitorTmp.setAddress(competitor.getAddress());
+        competitorTmp.setContraseña(competitor.getContraseña());
+        Query q = entityManager.createQuery("select u from Competitor u order by u.surname ASC");
+        List<Competitor> competitors = q.getResultList();
+        for (int i = 0; i < competitors.size(); i++) {
+
+            if(competitors.get(i).getAddress().equals(competitorTmp.getAddress())&&competitors.get(i).getContraseña().equals(competitorTmp.getContraseña())){
+                System.out.println("----> entra");
+                rta.put("Ingresó correctamente", competitors.get(i).getId());
+            }
+            else {
+            throw new NotAuthorizedException("No existe el usuario, porfavor verifique la informacion");
+            
+            }
+        }
+
+        return Response.status(200).header("Access-Control-Allow-Origin","*").entity(rta).build();
         
-      
-       String b = competitorTmp.getContraseña();
-       if(a.equals(b)){
-         try {
-         rta.put("Usuario Registrado", competitorTmp.getId());
-         
-         } catch (Throwable t) {
-         t.printStackTrace();
-         if (entityManager.getTransaction().isActive()) {
-         entityManager.getTransaction().rollback();
-         }
-         competitorTmp = null;
-         } finally {
-         entityManager.clear();
-         entityManager.close();
-         }}
-         return Response.status(200).header("Access-Control-Allow-Origin","*").entity(rta).build();
-         
-}
+        
+    }
+    public class NotAuthorizedException extends WebApplicationException {
+        public NotAuthorizedException(String message) {
+            super(Response.status(Response.Status.UNAUTHORIZED).entity(message).type(MediaType.TEXT_PLAIN).build());
+        }
+    }
 }
