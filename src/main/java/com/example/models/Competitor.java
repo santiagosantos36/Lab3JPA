@@ -59,13 +59,16 @@ public class Competitor implements Serializable{
     private String country;
     
     private boolean winner;
+    
+    
+    private String contraseña;
 
     
     public Competitor(){
         
     }
     
-    public Competitor(String nameN, String surnameN, int ageN,String telephoneN, String cellphoneN, String addressN, String  cityN, String countryN,boolean winnerN){
+    public Competitor(String nameN, String surnameN, int ageN,String telephoneN, String cellphoneN, String addressN, String  cityN, String countryN,boolean winnerN, String contraseñaN){
         name=nameN;
         surname=surnameN;
         age=ageN;
@@ -75,6 +78,7 @@ public class Competitor implements Serializable{
         city=cityN;
         country=countryN;
         winner=winnerN;
+        contraseña=contraseñaN;
     }
     
             @OneToMany(cascade=ALL, mappedBy="competitor")
@@ -92,6 +96,16 @@ public class Competitor implements Serializable{
  private void creationTimestamp() {
  this.createdAt = this.updatedAt = Calendar.getInstance();
  }
+
+    public String getContraseña() {
+        return contraseña;
+    }
+
+    public void setContraseña(String contraseña) {
+        this.contraseña = contraseña;
+    }
+ 
+ 
  public Long getId() {
  return id;
  }

@@ -70,6 +70,7 @@ public class CompetitorService {
  competitorTmp.setName(competitor.getName());
  competitorTmp.setSurname(competitor.getSurname());
  competitorTmp.setTelephone(competitor.getTelephone());
+ competitorTmp.setContraseña(competitor.getContraseña());
  try {
  entityManager.getTransaction().begin();
  entityManager.persist(competitorTmp);
@@ -89,5 +90,34 @@ public class CompetitorService {
  return Response.status(200).header("Access-Control-Allow-Origin","*").entity(rta).build();
     
     
+}
+    
+    @POST
+    @Path("/login")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response revision(CompetitorDTO competitor) {
+ 
+            JSONObject rta = new JSONObject();
+         Competitor competitorTmp = new Competitor();
+         String a = competitor.getContraseña();
+        
+      
+       String b = competitorTmp.getContraseña();
+       if(a.equals(b)){
+         try {
+         rta.put("Usuario Registrado", competitorTmp.getId());
+         
+         } catch (Throwable t) {
+         t.printStackTrace();
+         if (entityManager.getTransaction().isActive()) {
+         entityManager.getTransaction().rollback();
+         }
+         competitorTmp = null;
+         } finally {
+         entityManager.clear();
+         entityManager.close();
+         }}
+         return Response.status(200).header("Access-Control-Allow-Origin","*").entity(rta).build();
+         
 }
 }
